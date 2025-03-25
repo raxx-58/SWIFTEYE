@@ -14,13 +14,15 @@ CORS(app)  # Enable CORS for all routes
 MODEL_PATH = 'model.h5'
 model = load_model(MODEL_PATH)
 
-# Define a function to preprocess the image
+# Define a function to preprocess the image &&&&&
 def preprocess_image(image):
-    image = image.resize((224, 224))  # Resize the image to match model's expected sizing
-    image = img_to_array(image)  # Convert the image to a numpy array
+    target_size = (176, 176)  # Replace with the correct size from model.input_shape
+    image = image.resize(target_size)  # Resize image
+    image = img_to_array(image)  # Convert to numpy array
     image = np.expand_dims(image, axis=0)  # Add batch dimension
     image = image / 255.0  # Normalize the image
     return image
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
