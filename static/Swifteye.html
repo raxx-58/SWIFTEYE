@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swift Eye</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            background: url('https://cdn.pixabay.com/photo/2022/06/07/06/13/matrix-7247571_1280.png') no-repeat center center/cover;
+        }
+        
+        .header {
+            width: 100%;
+            background-color: #1b1b1b;
+            color: #4caf50;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 50px;
+            font-weight: bold;
+            font-family: "Times New Roman", Times, serif;
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            margin-top: 80px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .option-box {
+            background-color: #3a3a3a;
+            color: #4caf50;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .option-box:hover {
+            background-color: #4caf50;
+            color: black;
+            transform: scale(1.05);
+        }
+        input[type="file"] {
+            display: none;
+        }
+        video {
+            display: none;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .capture-btn, .reset-btn, .detect-btn {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: black;
+            background-color: #4caf50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .capture-btn:hover, .reset-btn:hover, .detect-btn:hover {
+            background-color: #45a049;
+        }
+        .preview {
+            display: none;
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 8px;
+        }
+        .console {
+            margin-top: 20px;
+            background-color: #1b1b1b;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 14px;
+            color: white;
+        }
+        .console p {
+            margin: 5px 0;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Swift Eye</div>
+    <div class="container">
+        <div class="option-box" onclick="document.getElementById('upload-photo').click()">
+            Upload Photo
+            <input type="file" id="upload-photo" accept="image/*" onchange="handleFileUpload(event)">
+        </div>
+
+        <div class="option-box" onclick="openCamera()">
+            Take Photo
+        </div>
+
+        <video id="webcam" autoplay></video>
+        <button id="capture-btn" class="capture-btn" onclick="capturePhoto()">Capture Photo</button>
+        <img id="preview" class="preview" alt="Preview">
+        
+        <div class="button-container">
+            <button id="detect-btn" class="detect-btn" onclick="detectImage()">Detect Image</button>
+            <button id="reset-btn" class="reset-btn" onclick="location.reload()">Reset</button>
+        </div>
+
+        <div class="console" id="console">
+            <p><strong>Console Output:</strong></p>
+        </div>
+    </div>
+    
+    <script>
+        let webcamStream;
+        const video = document.getElementById("webcam");
+        const preview = document.getElementById("preview");
+        const captureBtn = document.getElementById("capture-btn");
+        const detectBtn = document.getElementById("detect-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const consoleOutput = document.getElementById("console");
+
+        function openCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    webcamStream = stream;
+                    video.srcObject = stream;
+                    video.style.display = "block";
+                    captureBtn.style.display = "block";
+                })
+                .catch(err => console.log("Error accessing webcam: ", err));
+        }
+
+        function capturePhoto() {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            preview.src = canvas.toDataURL("image/png");
+            preview.style.display = "block";
+            video.style.display = "none";
+            captureBtn.style.display = "none";
+            detectBtn.style.display = "block";
+            resetBtn.style.display = "block";
+            webcamStream.getTracks().forEach(track => track.stop());
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                    detectBtn.style.display = "block";
+                    resetBtn.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function detectImage() {
+            consoleOutput.innerHTML += "<p>Detecting image...</p>";
+        }
+    </script>
+</body>
+</html>
