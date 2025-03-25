@@ -23,29 +23,68 @@ def preprocess_image(image):
     image = image / 255.0  # Normalize the image
     return image
 
-
+class_labels = ['apple',
+ 'banana',
+ 'beetroot',
+ 'bell pepper',
+ 'cabbage',
+ 'capsicum',
+ 'carrot',
+ 'cauliflower',
+ 'chilli pepper',
+ 'corn',
+ 'cucumber',
+ 'eggplant',
+ 'garlic',
+ 'ginger',
+ 'grapes',
+ 'jalepeno',
+ 'kiwi',
+ 'lemon',
+ 'lettuce',
+ 'mango',
+ 'onion',
+ 'orange',
+ 'paprika',
+ 'pear',
+ 'peas',
+ 'pineapple',
+ 'pomegranate',
+ 'potato',
+ 'raddish',
+ 'soy beans',
+ 'spinach',
+ 'sweetcorn',
+ 'sweetpotato',
+ 'tomato',
+ 'turnip',
+ 'watermelon']
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image provided'}), 400
+    try:  # ✅ Start Try Block
+        if "image" not in request.files:
+            return jsonify({"error": "No image uploaded"}), 400
 
-    file = request.files['image']
-
-    try:
+        file = request.files["image"]
         image = Image.open(io.BytesIO(file.read()))
         processed_image = preprocess_image(image)
+
+        # Make prediction
         prediction = model.predict(processed_image)
-        predicted_class = np.argmax(prediction, axis=1)[0]
-        confidence = float(np.max(prediction))
+        predicted_class = np.argmax(prediction)  # Get index of highest probability
+        confidence = float(np.max(prediction))  # Get confidence score
 
-        response = {
-            'predicted_class': int(predicted_class),
-            'confidence': confidence
-        }
-        return jsonify(response)
+        # Convert predicted class index to actual label
+        predicted_label = class_labels[predicted_class]
 
-    except Exception as e:
+        return jsonify({
+            "predicted_class": predicted_label,  # Return actual name, not index
+            "confidence": confidence
+        })
+
+    except Exception as e:  # ✅ Correct placement
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
