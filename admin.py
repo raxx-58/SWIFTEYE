@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Load the trained model
-MODEL_PATH = 'model.h5'
+MODEL_PATH = 'model_2.h5'
 model = load_model(MODEL_PATH)
 
 # Define a function to preprocess the image &&&&&
@@ -23,42 +23,7 @@ def preprocess_image(image):
     image = image / 255.0  # Normalize the image
     return image
 
-class_labels = ['apple',
- 'banana',
- 'beetroot',
- 'bell pepper',
- 'cabbage',
- 'capsicum',
- 'carrot',
- 'cauliflower',
- 'chilli pepper',
- 'corn',
- 'cucumber',
- 'eggplant',
- 'garlic',
- 'ginger',
- 'grapes',
- 'jalepeno',
- 'kiwi',
- 'lemon',
- 'lettuce',
- 'mango',
- 'onion',
- 'orange',
- 'paprika',
- 'pear',
- 'peas',
- 'pineapple',
- 'pomegranate',
- 'potato',
- 'raddish',
- 'soy beans',
- 'spinach',
- 'sweetcorn',
- 'sweetpotato',
- 'tomato',
- 'turnip',
- 'watermelon']
+class_labels = ['apple', 'banana', 'cabbage', 'capsicum', 'carrot', 'cauliflower', 'cucumber', 'garlic', 'ginger', 'grapes', 'lemon', 'onion', 'orange', 'potato', 'tomato']
 @app.route('/predict', methods=['POST'])
 def predict():
     try:  # ✅ Start Try Block
