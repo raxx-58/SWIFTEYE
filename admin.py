@@ -16,12 +16,16 @@ model = load_model(MODEL_PATH)
 
 # Define a function to preprocess the image &&&&&
 def preprocess_image(image):
-    target_size = (176, 176)  # Replace with the correct size from model.input_shape
+    target_size = (256, 256)  # Update this based on `model.input_shape`
     image = image.resize(target_size)  # Resize image
-    image = img_to_array(image)  # Convert to numpy array
-    image = np.expand_dims(image, axis=0)  # Add batch dimension
-    image = image / 255.0  # Normalize the image
+    image = img_to_array(image)  # Convert to NumPy array
+    image = image / 255.0  # Normalize pixel values
+    
+    # Flatten the image if the model expects a 1D array
+    image = image.reshape(1, 256 * 256 * 3)  # Flatten to match model input shape
+    
     return image
+
 
 class_labels = ['apple', 'banana', 'cabbage', 'capsicum', 'carrot', 'cauliflower', 'cucumber', 'garlic', 'ginger', 'grapes', 'lemon', 'onion', 'orange', 'potato', 'tomato']
 @app.route('/predict', methods=['POST'])
