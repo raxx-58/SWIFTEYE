@@ -28,7 +28,6 @@
             font-size: 50px;
             font-weight: bold;
             font-family: "Times New Roman", Times, serif;
-            font-weight: bold;
             position: absolute;
             top: 0;
             left: 0;
@@ -41,7 +40,6 @@
             margin-top: 80px;
             background-color: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
-            padding: 20px;
         }
         .option-box {
             background-color: #3a3a3a;
@@ -147,6 +145,7 @@
         const detectBtn = document.getElementById("detect-btn");
         const resetBtn = document.getElementById("reset-btn");
         const consoleOutput = document.getElementById("console");
+        let selectedFile = null;
 
         function openCamera() {
             navigator.mediaDevices.getUserMedia({ video: true })
@@ -165,6 +164,11 @@
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(blob => {
+                selectedFile = new File([blob], "captured.png", { type: "image/png" });
+            }, "image/png");
+
             preview.src = canvas.toDataURL("image/png");
             preview.style.display = "block";
             video.style.display = "none";
@@ -177,6 +181,7 @@
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file) {
+                selectedFile = file;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.src = e.target.result;
@@ -189,7 +194,26 @@
         }
 
         function detectImage() {
-            consoleOutput.innerHTML += "<p>Detecting image...</p>";
+            if (!selectedFile) {
+                consoleOutput.innerHTML += "<p>No image selected!</p>";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", selectedFile);
+
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                consoleOutput.innerHTML += `<p>Prediction: <strong>${data.predicted_class}</strong></p>`;
+                consoleOutput.innerHTML += `<p>Confidence: ${(data.confidence * 100).toFixed(2)}%</p>`;
+            })
+            .catch(error => {
+                consoleOutput.innerHTML += `<p>Error: ${error.message}</p>`;
+            });
         }
     </script>
 </body>
