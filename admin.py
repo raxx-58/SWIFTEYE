@@ -16,14 +16,14 @@ model = load_model(MODEL_PATH)
 
 # Define a function to preprocess the image &&&&&
 def preprocess_image(image):
-    target_size = (256, 256)  # Update this based on `model.input_shape`
+    target_size = (256, 256)  # Ensure this matches model.input_shape[1:3]
     image = image.resize(target_size)  # Resize image
     image = img_to_array(image)  # Convert to NumPy array
     image = image / 255.0  # Normalize pixel values
     
-    # Flatten the image if the model expects a 1D array
-    image = image.reshape(1, 256 * 256 * 3)  # Flatten to match model input shape
-    
+    # ✅ Keep 4D shape (batch_size, height, width, channels)
+    image = np.expand_dims(image, axis=0)  # Model expects (1, 256, 256, 3)
+
     return image
 
 
