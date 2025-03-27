@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import tensorflow as tf
 from tensorflow.keras.models import load_model
@@ -6,7 +6,6 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from PIL import Image
 import numpy as np
 import io
-import os
 
 app = Flask(__name__, static_folder='static', template_folder='static')
 CORS(app)  # Enable CORS for all routes
