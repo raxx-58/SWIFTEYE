@@ -11,20 +11,20 @@ import webbrowser
 app = Flask(__name__)
 CORS(app)  #CORS for all routes
 
-#trained model
+#the trained model
 MODEL_PATH = 'model_2.h5'
 model = load_model(MODEL_PATH)
 
-# a function to preprocess the image
+#function to preprocess the image &&&&&
 
 
 def preprocess_image(image):
-    target_size = (256, 256)  #this matches model.input_shape[1:3]
+    target_size = (256, 256)  # this matches model.input_shape[1:3]
     image = image.resize(target_size)  # Resize image
     image = img_to_array(image)  # Convert to NumPy array
     image = image / 255.0  # Normalize pixel values
 
-    #Keeping 4D shape (batch_size, height, width, channels)
+    # 4D shape (batch_size, height, width, channels)
     image = np.expand_dims(image, axis=0)  # Model expects (1, 256, 256, 3)
 
     return image
@@ -41,7 +41,7 @@ class_labels = ['apple', 'banana', 'cabbage', 'capsicum', 'carrot', 'cauliflower
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    try:  #  Try Block
+    try:  # Try Block
         if "image" not in request.files:
             return jsonify({"error": "No image uploaded"}), 400
 
@@ -63,7 +63,7 @@ def predict():
             "confidence": confidence
         })
 
-    except Exception as e:  #Correct placement
+    except Exception as e:  # placement
         return jsonify({'error': str(e)}), 500
 
 
